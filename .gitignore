@@ -22,3 +22,4 @@ yarn.lock
 api/media/*
 package-lock.json
 api/files/*
+api/env

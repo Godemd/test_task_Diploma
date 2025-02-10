@@ -19,7 +19,7 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_DB: postgres
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U postgres -d postgres" ]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -27,7 +27,7 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '1'
+          cpus: "1"
           memory: 4G
 
   amqp:
@@ -50,7 +50,8 @@ services:
     container_name: app_notifications
     command: bash -c "python3 main.py"
     restart: always
-
+    depends_on:
+      - app_base
     environment:
       APP_SERVICE_URL: amqp://guest:guest@amqp:5672/
       APP_NOTIFICATIONS_PORT: 8080
@@ -65,6 +66,7 @@ services:
     command: bash -c "python3 main.py"
     restart: on-failure
     depends_on:
+      - app_base
       - amqp
       - db
     environment:

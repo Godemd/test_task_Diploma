@@ -38,21 +38,9 @@ def test_auth_using_login_pass(anon_client: 'APIClient', user_with_password: 'Us
 
 @pytest.mark.django_db
 def test_user_flow(admin_client: 'APIClient', anon_client: 'APIClient'):
-    """
-    TODO Дополните тест.
-     Требуется подготовить данные для создания нескольких рандомных пользователей используя клиент для admin
-     (не забудьте вначале починить фикстуру admin) и выполнить следующие действия:
-     1. Создать пользователя отправив POST-запрос на url '/api/v1/users/'
-        response.status_code == 200
-     2. Проверить количество созданных пользователей отправив GET-запрос на url '/api/v1/users/'
-        response.status_code == 200
-     3. Проверить авторизацию для каждого нового пользователя. Необходимо используя анонимный клиент
-        отправить POST-запрос на url f'/api/v1/users/{created_users_id}/' response.status_code == 200
-     4. Удалить всех созданных пользователей, отправив DELETE-запрос на url f'/api/v1/users/{created_users_id}/',
-        response.status_code == 204
-
-    Пример создания данных для рандомных пользователей.
-
+    """Тестирование полного цикла работы с пользователями"""
+    
+    # Подготовка тестовых данных
     users_count = 20
     users_data = [
         {
@@ -62,7 +50,48 @@ def test_user_flow(admin_client: 'APIClient', anon_client: 'APIClient'):
         }
         for i in range(users_count)
     ]
-
-    """
-
-    ...
+    
+    created_users_ids = []
+    
+    # 1. Создание пользователей
+    for user_data in users_data:
+        response = admin_client.post(
+            '/api/v1/users/',
+            data=user_data,
+            format='json'
+        )
+        assert response.status_code == 200, f"Ошибка создания пользователя: {response.content}"
+        created_users_ids.append(response.json()['id'])
+    
+    # 2. Проверка количества созданных пользователей
+    response = admin_client.get('/api/v1/users/')
+    assert response.status_code == 200
+    users_list = response.json()
+    assert len([u for u in users_list if u['id'] in created_users_ids]) == users_count, \
+        f"Количество созданных пользователей не совпадает: ожидалось {users_count}"
+    
+    # 3. Проверка авторизации для каждого пользователя
+    for i, user_id in enumerate(created_users_ids):
+        auth_data = {
+            'username': f'user_{i}',
+            'password': f'password_{i}'
+        }
+        response = anon_client.post(
+            '/api/auth/login/',
+            data=auth_data,
+            format='json'
+        )
+        assert response.status_code == 200, \
+            f"Ошибка авторизации пользователя {auth_data['username']}: {response.content}"
+    
+    # 4. Удаление созданных пользователей
+    for user_id in created_users_ids:
+        response = admin_client.delete(f'/api/v1/users/{user_id}/')
+        assert response.status_code == 204, \
+            f"Ошибка удаления пользователя {user_id}: {response.content}"
+    
+    # Проверка удаления
+    response = admin_client.get('/api/v1/users/')
+    users_after = response.json()
+    remaining_users = [u for u in users_after if u['id'] in created_users_ids]
+    assert len(remaining_users) == 0, "Не все пользователи были удалены"
