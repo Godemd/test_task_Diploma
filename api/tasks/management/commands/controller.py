@@ -10,21 +10,22 @@ from app_lib.services.notification_service import NotificationService
 from app_lib.connections import SyncConnection
 from tasks.handlers import handler
 
-
 logger = get_logger('tasks.controller')
-Request = Union['ControlRequest']
-
+RequestType = Union[Service, NotificationService]
 
 class Command(BaseCommand):
+    """
+    Custom Django management command to initialize and manage services.
+    """
     def handle(self, *args, **options):
-        controller = Service(**controller_config)
-        notifications = NotificationService()
-        connection = SyncConnection(settings.APP_SERVICE_URL)
-        controller.setup(connection, create_queue=True)
-        notifications.setup(connection, create_queue=True)
+        service_controller = Service(**controller_config)
+        notification_service = NotificationService()
+        sync_connection = SyncConnection(settings.APP_SERVICE_URL)
 
-        def consume(request: Request, message_ack: Callable):
-            handler(request, controller, notifications, message_ack)
+        service_controller.setup(sync_connection, create_queue=True)
+        notification_service.setup(sync_connection, create_queue=True)
 
-        controller.consume(consume)
+        def process_request(request: RequestType, acknowledge_message: Callable):
+            handler(request, service_controller, notification_service, acknowledge_message)
 
+        service_controller.consume(process_request)
