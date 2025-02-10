@@ -8,6 +8,7 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'app.settings')
 django_app = get_wsgi_application()
 
 
+
 def number_of_workers():
     return (multiprocessing.cpu_count() * 2) + 1
 
