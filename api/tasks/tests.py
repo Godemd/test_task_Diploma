@@ -1,7 +1,7 @@
 import pytest
 from typing import TYPE_CHECKING, Callable, NoReturn, Tuple, Any
 
-from lib.build.lib.app_lib.messages.message import RenameFileRequest
+from lib.app_lib.messages.message import RenameFileRequest
 from tasks.models import File
 
 if TYPE_CHECKING:
@@ -14,55 +14,62 @@ Service = Tuple[Callable[[Any], NoReturn], Callable[[], dict], Callable[[], dict
 
 
 @pytest.mark.django_db
-def test_files_normal_flow(
+def test_file_creation_and_retrieval_flow(
         client: 'APIClient',
         user: 'User',
-        tested_file: 'SimpleUploadedFile'
+        uploaded_file: 'SimpleUploadedFile'
 ):
-    response = client.post(
-        '/api/v1/files/', data={'file': tested_file}, format='multipart'
+    # Тест на создание и получение файла
+    create_response = client.post(
+        '/api/v1/files/', data={'file': uploaded_file}, format='multipart'
     )
-    assert response.status_code == 201, response.content
-    created_data = response.json()
+    assert create_response.status_code == 201, f"Expected 201, got {create_response.status_code}: {create_response.content}"
 
-    assert created_data['name'] == tested_file.name
+    file_data = create_response.json()
 
-    response = client.get(f'/api/v1/files/{created_data["id"]}/')
-    assert response.status_code == 200
+    # Проверка имени файла
+    assert file_data['name'] == uploaded_file.name, f"Expected file name to be {uploaded_file.name}, got {file_data['name']}"
 
-    get_data = response.json()
-    assert created_data['name'] == get_data['name']
+    # Получаем файл по ID и проверяем его данные
+    file_id = file_data["id"]
+    retrieve_response = client.get(f'/api/v1/files/{file_id}/')
+    assert retrieve_response.status_code == 200, f"Expected 200, got {retrieve_response.status_code}"
+
+    retrieved_file_data = retrieve_response.json()
+    assert retrieved_file_data['name'] == file_data['name'], "File name does not match"
 
 
 @pytest.mark.django_db
-def test_files_service(
+def test_file_rename_service_flow(
         client: 'APIClient',
         file_data: dict,
         service: Service,
-        tested_file_split_name: 'Tuple'
+        file_name_parts: 'Tuple'
 ):
+    file_id = file_data.get("id")
 
-    file_pk = file_data.get("id")
+    # Проверка данных файла через GET запрос
+    get_response = client.get(f'/api/v1/files/{file_id}/')
+    assert get_response.status_code == 200, f"Expected 200, got {get_response.status_code}"
 
-    response = client.get(f'/api/v1/files/{file_pk}/')
+    file_instance_data = get_response.json()
+    current_file_name = file_instance_data.get('name')
+    current_extension = file_instance_data.get('extension')
+    current_file_id = file_instance_data.get('id')
 
-    assert response.status_code == 200
+    # Убедимся, что файл с правильным ID был возвращен
+    assert file_id == current_file_id, f"Expected file ID to be {file_id}, got {current_file_id}"
+    assert current_file_name == '.'.join(file_name_parts), f"Expected file name to be {'.'.join(file_name_parts)}, got {current_file_name}"
+    assert not current_extension, "File should not have an extension set"
 
-    get_data = response.json()
-    _file_name = get_data.get('name')
-    _extension = get_data.get('extension')
-    _file_instance_pk = get_data.get('id')
-
-    assert file_pk == _file_instance_pk
-    assert _file_name == '.'.join(tested_file_split_name)
-    assert not _extension
-
+    # Механизм сервисного переименования
     send, dispatch, dispatch_notifications = service
+    send(RenameFileRequest(id=file_id))  # Отправка запроса на переименование
+    dispatch()  # Выполнение dispatch
 
-    send(RenameFileRequest(id=file_pk))
-    dispatch()
+    # Получаем обновленный экземпляр файла из БД
+    updated_file_instance = File.objects.get(pk=file_id)
 
-    file_instance = File.objects.get(pk=file_pk)
-
-    assert file_instance.name == tested_file_split_name[0]
-    assert file_instance.extension == tested_file_split_name[1]
+    # Проверяем, что имя файла обновилось
+    assert updated_file_instance.name == '.'.join(file_name_parts), f"Expected updated file name to be {'.'.join(file_name_parts)}, got {updated_file_instance.name}"
+    assert not updated_file_instance.extension, "File extension should still be empty after rename"
