@@ -2,11 +2,11 @@
 from django.apps import AppConfig
 from django.conf import settings
 
-from lib import app_lib
-from lib.app_lib.connections import SyncConnection
-from lib.app_lib.services.controller.config import controller_config
-from lib.app_lib.services.main import Service
-from lib.app_lib.services.notification_service import NotificationService
+import app_lib
+from app_lib.connections import SyncConnection
+from app_lib.services.controller.config import controller_config
+from app_lib.services.main import Service
+from app_lib.services.notification_service import NotificationService
 
 
 class TasksConfig(AppConfig):

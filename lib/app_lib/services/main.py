@@ -21,7 +21,7 @@ from app_lib.log import get_logger
 from app_lib.messages.message import Message
 
 if TYPE_CHECKING:
-    from markets_lib.connections import Connections  # NOQA
+    from ..connections import Connections  # NOQA
 
 
 T = TypeVar('T')

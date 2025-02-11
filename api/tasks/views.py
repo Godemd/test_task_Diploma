@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework.serializers import BaseSerializer
 from rest_framework.viewsets import ModelViewSet
 
-from lib.app_lib.messages.message import RenameFileRequest
+from app_lib.messages.message import RenameFileRequest
 from tasks.apps import TasksConfig
 from tasks.models import File
 from tasks.serializers import FileCreateSerializer, FileSerializer

@@ -1,11 +1,11 @@
 from functools import singledispatch
 from typing import Callable
 
-from lib.app_lib.enums import NotificationType
-from lib.app_lib.messages.message import RenameFileRequest
-from lib.app_lib.log import get_logger
-from lib.app_lib.services.main import Service
-from lib.app_lib.services.notification_service import NotificationService
+from app_lib.enums import NotificationType
+from app_lib.messages.message import RenameFileRequest
+from app_lib.log import get_logger
+from app_lib.services.main import Service
+from app_lib.services.notification_service import NotificationService
 
 from app.tools import send_to_all
 from tasks.models import File
