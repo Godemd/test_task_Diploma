@@ -3,11 +3,11 @@ from typing import Union, Callable
 from django.conf import settings
 from django.core.management.base import BaseCommand
 
-from app_lib.services.controller.config import controller_config
-from app_lib.log import get_logger
-from app_lib.services.main import Service
-from app_lib.services.notification_service import NotificationService
-from app_lib.connections import SyncConnection
+from lib.app_lib.services.controller.config import controller_config
+from lib.app_lib.log import get_logger
+from lib.app_lib.services.main import Service
+from lib.app_lib.services.notification_service import NotificationService
+from lib.app_lib.connections import SyncConnection
 from tasks.handlers import handler
 
 
