@@ -25,8 +25,8 @@ def anon_client():
 
 @pytest.fixture
 def user():
-    user = User.objects.create_user(username=TEST_USER, is_superuser=True)
-    return user
+    test_user = User.objects.create_user(username=TEST_USER, is_superuser=True)
+    return test_user
 
 
 @pytest.fixture
@@ -72,10 +72,10 @@ def tested_file(file_content):
 
 @pytest.fixture
 def tested_file_split_name(tested_file):
-    values = tested_file.name.split('.')
-    _name = values[0]
-    _extension = values[1]
-    return _name, _extension
+    name_parts = tested_file.name.split('.')
+    base_name = name_parts[0]
+    extension = name_parts[1]
+    return base_name, extension
 
 
 @pytest.fixture
@@ -98,24 +98,24 @@ def service(connection):
         app_config.service.get_queue_params(), lambda x, y: None
     )
 
-    empty = False
-    # We need clean queue before using
-    while not empty:
+    queue_empty = False
+    # Очистка очереди перед использованием
+    while not queue_empty:
         try:
             empty_dispatch()
         except Empty:
-            empty = True
+            queue_empty = True
 
-    def consumer_tasks(request, message_ack):
+    def consume_tasks(request, message_ack):
         handler(request, app_config.service, notification_service, message_ack)
 
-    def consumer_notifications(request):
+    def consume_notifications(request):
         pass
 
     return (
         app_config.service.send_to_controller,
-        app_config.service.consume(consumer_tasks),
-        notification_service.consume(consumer_notifications),
+        app_config.service.consume(consume_tasks),
+        notification_service.consume(consume_notifications),
     )
 
 
