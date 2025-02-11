@@ -33,25 +33,36 @@ schema_view = get_schema_view(
         default_version='v1',
     ),
     public=True,
-    permission_classes=[permissions.AllowAny],
+    permission_classes=(permissions.AllowAny,),
     url=settings.APP_API_HOST,
 )
 
 router = routers.SimpleRouter()
-router.register('users', UserViewSet)
-router.register('files', FileModelViewSet)
+router.register(r'users', UserViewSet)
+router.register(r'files', FileModelViewSet)
 
-urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('api/v1/', include(router.urls)),
-    path('api/v1/me/', ensure_csrf_cookie(MeViewSet.as_view({'get': 'retrieve'}))),
-    path('api/auth/login/', LoginView.as_view()),
-    path('api/auth/logout/', LogoutView.as_view()),
-    path('api/notifications/', NotificationView.as_view()),
-    re_path(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
-    path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
-    path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
+urlpatterns = []
+
+urlpatterns += [path('admin/', admin.site.urls), path('api/v1/', include(router.urls))]
+
+urlpatterns += [
+    path(r'api/v1/me/', ensure_csrf_cookie(MeViewSet.as_view({'get': 'retrieve'}))),
+    path(r'api/auth/login/', LoginView.as_view()),
+    path(r'api/auth/logout/', LogoutView.as_view()),
+    path(r'api/notifications/', NotificationView.as_view()),
+    re_path(
+        r'^swagger(?P<format>\.json|\.yaml)$',
+        schema_view.without_ui(cache_timeout=0),
+        name='schema-json',
+    ),
+    path(
+        r'swagger/',
+        schema_view.with_ui('swagger', cache_timeout=0),
+        name='schema-swagger-ui',
+    ),
+    path(r'redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
 ]
+
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

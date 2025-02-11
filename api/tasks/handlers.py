@@ -1,7 +1,7 @@
 from functools import singledispatch
 from typing import Callable
 
-from app_lib.enums import NotificationType
+from app_lib.notifications.enums import NotificationType
 from app_lib.messages.message import RenameFileRequest
 from app_lib.log import get_logger
 from app_lib.services.main import Service
