@@ -8,22 +8,10 @@ class IsOwnerOrReadOnly(permissions.BasePermission):
     """
 
     def has_object_permission(self, request, view, obj):
-        """
-        Проверяет, имеет ли текущий пользователь права на изменение объекта.
-        
-        Разрешения на чтение разрешены любому пользователю, а на изменение только владельцу.
-
-        Args:
-            request (Request): Запрос от клиента.
-            view (View): Представление, обрабатывающее запрос.
-            obj (Model): Объект модели, для которого проверяются права доступа.
-
-        Returns:
-            bool: Разрешено ли пользователю выполнять операцию.
-        """
-        # Разрешения на чтение (GET, HEAD, OPTIONS) доступны всем пользователям
+        # Read permissions are allowed to any request,
+        # so we'll always allow GET, HEAD or OPTIONS requests.
         if request.method in permissions.SAFE_METHODS:
             return True
 
-        # Для изменения объекта (POST, PUT, DELETE и т.д.) проверяется, является ли текущий пользователь владельцем
+        # Instance must have an attribute named `owner`.
         return obj.owner == request.user

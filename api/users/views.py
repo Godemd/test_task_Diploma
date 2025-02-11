@@ -19,72 +19,62 @@ from users.serializers import (
 
 
 class LoginView(APIView):
-    """Обработчик входа пользователя в систему."""
 
     @method_decorator(csrf_protect)
     @method_decorator(never_cache)
     def post(self, request, *args, **kwargs):
-        """Метод аутентификации по имени пользователя и паролю."""
-        serializer = LoginSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-
-        username = serializer.validated_data["username"]
-        password = serializer.validated_data["password"]
-
+        request_serializer = LoginSerializer(data=request.data)
+        request_serializer.is_valid(raise_exception=True)
         try:
-            user = User.objects.get(username=username)
-            if not user.check_password(password):
-                raise AuthenticationFailed("Неверные учетные данные")
-
-            login(request, user)
-            return Response(MeSerializer(instance=user).data)
-
+            user: User = User.objects.get(
+                username=request_serializer.validated_data['username']
+            )
+            if user.check_password(request_serializer.validated_data['password']):
+                login(request, user)
+                response_serializer = MeSerializer(instance=user)
+                response = Response(response_serializer.data)
+                return response
+            else:
+                raise AuthenticationFailed('Invalid credentials')
         except User.DoesNotExist:
-            raise AuthenticationFailed("Неверные учетные данные")
+            raise AuthenticationFailed('Invalid credentials')
 
 
 class LogoutView(APIView):
-    """Обработчик выхода пользователя из системы."""
-
     @method_decorator(never_cache)
     def post(self, request, *args, **kwargs):
-        """Выход из системы, сброс сеанса пользователя."""
         logout(request)
-        return Response(status=204)
+        response = Response()
+        return response
 
 
 class MeViewSet(ReadOnlyModelViewSet):
-    """API для получения информации о текущем пользователе."""
-
     permission_classes = (IsAuthenticated,)
     serializer_class = MeSerializer
 
-    def get_object(self) -> User:
-        """Возвращает текущего аутентифицированного пользователя."""
+    def get_object(self) -> 'User':
         return self.request.user
 
 
 class NotificationView(APIView):
-    """API для получения уведомлений пользователя."""
-
     permission_classes = (IsAuthenticated,)
 
     def get(self, request, *args, **kwargs):
-        """Возвращает заголовок X-Accel-Redirect с ссылкой на WebSocket."""
         user = self.request.user
-        if not user:
-            raise NotAuthenticated("Пользователь не аутентифицирован")
-
-        return Response(headers={"X-Accel-Redirect": f"/ws/{user.id}"})
+        if user:
+            return Response(headers={'X-Accel-Redirect': f'/ws/{user.id}'})
+        else:
+            raise NotAuthenticated('Invalid credentials')
 
 
 class UserViewSet(ModelViewSet):
-    """API для управления пользователями (доступно только администраторам)."""
-
-    queryset = User.objects.filter(is_staff=False).order_by("-id")
+    queryset = User.objects.filter(is_staff=False).order_by('-id')
     permission_classes = (IsAdminUser,)
+    serializer_class = UserSerializer
     pagination_class = UsersPagination
 
     def get_serializer_class(self):
-        """Выбирает сериализатор в зависимости от действия."""
-        return UserListSerializer if self.action == "list" else UserSerializer
+        if self.action == 'list':
+            return UserListSerializer
+        else:
+            return UserSerializer
