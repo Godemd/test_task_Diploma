@@ -1,10 +1,9 @@
 from typing import Optional
 
 from aio_pika import ExchangeType
-from app_lib.log import get_logger
-
 from app_lib.classes.base import ExchangeParams, QueueParams
 from app_lib.classes.notification import Notification
+from app_lib.log import get_logger
 from app_lib.messages.message import Message
 from app_lib.services.main import BaseService
 
@@ -24,7 +23,7 @@ class NotificationService(BaseService):
             auto_delete=True, durable=False, exclusive=True
         )
 
-        self.logger = get_logger(f'notifications')
+        self.logger = get_logger('notifications')
 
         self._register[Notification.__name__] = Notification
 

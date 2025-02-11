@@ -1,6 +1,7 @@
 import json
-from abc import abstractmethod, ABC
+from abc import ABC, abstractmethod
 from asyncio import iscoroutinefunction
+from logging import Logger
 from typing import (
     TYPE_CHECKING,
     Any,
@@ -10,16 +11,14 @@ from typing import (
     List,
     Type,
     TypeVar,
-    Union
+    Union,
 )
 
 from aio_pika import IncomingMessage
 from app_lib.amqp_routes import CONTROLLER, CONTROLLER_EXCHANGE
-
+from app_lib.classes.base import ExchangeParams, QueueParams
 from app_lib.log import get_logger
 from app_lib.messages.message import Message
-from logging import Logger
-from app_lib.classes.base import QueueParams, ExchangeParams
 
 if TYPE_CHECKING:
     from markets_lib.connections import Connections  # NOQA
@@ -28,10 +27,7 @@ if TYPE_CHECKING:
 T = TypeVar('T')
 
 
-__all__ = [
-    'BaseService',
-    'Service'
-]
+__all__ = ['BaseService', 'Service']
 
 
 class BaseService(Generic[T]):
@@ -40,24 +36,20 @@ class BaseService(Generic[T]):
     conn: 'Connections'
 
     @abstractmethod
-    def get_exchange_params(self) -> 'ExchangeParams':
-        ...
+    def get_exchange_params(self) -> 'ExchangeParams': ...
 
     @abstractmethod
-    def get_queue_params(self) -> 'QueueParams':
-        ...
+    def get_queue_params(self) -> 'QueueParams': ...
 
     @abstractmethod
     def get_routing_name(self, *args, **kwargs) -> str:
         return ''
 
     @abstractmethod
-    def get_message(self, *args, **kwargs) -> 'Message':
-        ...
+    def get_message(self, *args, **kwargs) -> 'Message': ...
 
     @abstractmethod
-    def get_heartbeat_message(self) -> 'Message':
-        ...
+    def get_heartbeat_message(self) -> 'Message': ...
 
     def get_empty_message(self) -> 'Message':
         message = Message({})
@@ -111,13 +103,15 @@ class BaseService(Generic[T]):
 
 class Service(BaseService, ABC):
 
-    def __init__(self,
-                 name: 'str',
-                 exchange_name: 'str',
-                 queue_name: 'str',
-                 routing_name: 'str',
-                 types: List[Type[object]],
-                 **kwargs):
+    def __init__(
+        self,
+        name: 'str',
+        exchange_name: 'str',
+        queue_name: 'str',
+        routing_name: 'str',
+        types: List[Type[object]],
+        **kwargs,
+    ):
         super().__init__(**kwargs)
 
         self.name = name
