@@ -152,6 +152,5 @@ APP_SERVICE_CONNECTION = os.environ.get(
     'APP_SERVICE_CONNECTION', 'SyncConnection'
 )
 
-APP_API_HOST = os.environ.get('APP_API_HOST', 'http://localhost')
-
+APP_API_HOST = os.environ.get('APP_API_HOST','http://localhost')
 APP_PAGE_SIZES = [10, 20, 50, 100]

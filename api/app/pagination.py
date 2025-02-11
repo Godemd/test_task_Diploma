@@ -7,7 +7,7 @@ from rest_framework.response import Response
 
 class BasePagination(PageNumberPagination):
     page_size: int
-    page_sizes = settings.APP_PAGE_SIZES
+    page_sizes = [10, 20, 50]
 
     def get_page_size(self, request: Request) -> int:
         try:
