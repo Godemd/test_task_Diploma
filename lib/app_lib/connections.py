@@ -16,21 +16,20 @@ from typing import (
     Union,
 )
 
-from aio_pika import Message as AioMessage, connect_robust
-from pika import BasicProperties, BlockingConnection, URLParameters, exceptions
+from aio_pika import Message as AioMessage
+from aio_pika import connect_robust
 from app_lib.log import get_logger
+from pika import BasicProperties, BlockingConnection, URLParameters, exceptions
 
 if TYPE_CHECKING:
     import asyncio  # NOQA
-    from pika.spec import Basic, BasicProperties  # NOQA
+
+    from aio_pika import Exchange as AioExchange  # NOQA
+    from aio_pika import IncomingMessage, RobustConnection
+    from app_lib.classes import ExchangeParams, QueueParams
     from messages import Message
     from pika.channel import Channel
-    from aio_pika import (  # NOQA
-        Exchange as AioExchange,
-        RobustConnection,
-        IncomingMessage,
-    )
-    from app_lib.classes import QueueParams, ExchangeParams
+    from pika.spec import Basic, BasicProperties  # NOQA
 
 
 __all__ = ['AsyncConnection', 'SyncConnection', 'QueueConnection']
@@ -52,18 +51,15 @@ class BaseConnection:
         self._connection = None
 
     @abstractmethod
-    def connect(self) -> NoReturn:
-        ...
+    def connect(self) -> NoReturn: ...
 
     @abstractmethod
-    def send(self, msg: 'Message') -> NoReturn:
-        ...
+    def send(self, msg: 'Message') -> NoReturn: ...
 
     @abstractmethod
     def consuming(
         self, queue_params: 'QueueParams', callback: Callable[[Any], Any]
-    ) -> NoReturn:
-        ...
+    ) -> NoReturn: ...
 
     @abstractmethod
     def create_queue(
@@ -71,8 +67,7 @@ class BaseConnection:
         queue_params: 'QueueParams',
         exchange_params: 'ExchangeParams',
         routing_key: str = '',
-    ) -> NoReturn:
-        ...
+    ) -> NoReturn: ...
 
 
 class AsyncConnection(BaseConnection):
@@ -217,6 +212,7 @@ class SyncConnection(BaseConnection):
         ):
             def message_ack():
                 channel.basic_ack(delivery_tag=method_frame.delivery_tag)
+
             try:
                 callback(body, message_ack)
             except Exception as e:
@@ -286,8 +282,7 @@ class QueueConnection(BaseConnection):
         self._exchanges = defaultdict(list)
         self._queues = defaultdict(Queue)
 
-    def connect(self) -> NoReturn:
-        ...
+    def connect(self) -> NoReturn: ...
 
     def send(self, msg: 'Message') -> NoReturn:
         for queue in self._exchanges[(msg.exchange, msg.routing_key)]:
@@ -298,8 +293,7 @@ class QueueConnection(BaseConnection):
     ) -> Callable:
         queue = self._queues[queue_params.name]
 
-        def message_ack():
-            ...
+        def message_ack(): ...
 
         def _():
             string = queue.get_nowait()
@@ -323,4 +317,3 @@ class QueueConnection(BaseConnection):
 
 
 Connections = Union[AsyncConnection, SyncConnection, QueueConnection]
-

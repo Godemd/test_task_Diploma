@@ -1,5 +1,5 @@
 from collections import namedtuple
-from dataclasses import asdict, is_dataclass, dataclass
+from dataclasses import asdict, dataclass, is_dataclass
 from json import dumps
 from typing import TYPE_CHECKING, Optional
 
@@ -15,10 +15,7 @@ META_FIELD = '_meta'
 
 MetaMessage = namedtuple('MetaMessage', [TYPE_FIELD], defaults=[None])
 
-__all__ = [
-    'Message',
-    'RenameFileRequest'
-]
+__all__ = ['Message', 'RenameFileRequest']
 
 
 class Message:

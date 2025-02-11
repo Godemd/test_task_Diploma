@@ -3,11 +3,7 @@ from uuid import uuid4
 
 from aio_pika import ExchangeType
 
-__all__ = [
-    'Base',
-    'QueueParams',
-    'ExchangeParams'
-]
+__all__ = ['Base', 'QueueParams', 'ExchangeParams']
 
 
 @dataclass
