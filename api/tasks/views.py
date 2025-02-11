@@ -12,76 +12,66 @@ from tasks.models import File
 from tasks.serializers import FileCreateSerializer, FileSerializer
 from django.apps import apps
 
-# Получение конфигурации приложения для использования службы
 app_config: 'TasksConfig' = apps.get_app_config('tasks')
 
 
 class FileModelViewSet(ModelViewSet):
-    """
-    Обработчик запросов для работы с файлами.
-    Этот ViewSet позволяет создавать, получать и удалять файлы.
-    """
     queryset = File.objects.all()
     permission_classes = (IsAuthenticated,)
 
-    def get_queryset(self) -> QuerySet:
+    def get_queryset(self) -> 'QuerySet':
         """
-        Переопределяет метод для получения всех файлов.
 
         Returns:
-            QuerySet: Все файлы.
+            QuerySet: 
         """
         return self.queryset.all()
 
     def create(self, request, *args, **kwargs):
-        """
-        Обрабатывает создание нового файла.
+        """creating file
 
         Args:
-            request (Request): Входящий запрос.
+            request (Request): _request_
 
         Returns:
-            Response: Ответ с данными нового файла и статусом HTTP 201.
+            Response: _description_
         """
         serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)  # Валидируем данные
 
-        # Сохраняем файл
+        serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
 
-        # Отправляем запрос на переименование файла через сервис
-        app_config.service.send_to_controller(RenameFileRequest(id=serializer.instance.pk))
+        app_config.service.send_to_controller(
+            RenameFileRequest(id=serializer.instance.pk)
+        )
 
         return Response(
             serializer.data, status=status.HTTP_201_CREATED, headers=headers
         )
 
     def destroy(self, request, *args, **kwargs):
-        """
-        Удаляет файл по ID.
+        """destroy files
 
         Args:
-            request (Request): Входящий запрос на удаление.
+            request (Request): _request_
 
         Returns:
-            Response: Ответ с подтверждением удаления.
+            Response: _description_
         """
         instance = self.get_object()
         pk = instance.pk
-
-        # Удаляем файл
         self.perform_destroy(instance)
+        return Response(data=pk, status=status.HTTP_202_ACCEPTED)
 
-        return Response(data={'id': pk}, status=status.HTTP_202_ACCEPTED)
-
-    def get_serializer_class(self) -> Type[BaseSerializer]:
-        """
-        Определяет, какой сериализатор использовать в зависимости от HTTP-метода.
+    def get_serializer_class(self) -> Type['BaseSerializer']:
+        """get serializer class
 
         Returns:
-            Type[BaseSerializer]: Класс сериализатора для текущего запроса.
+            Type[BaseSerializer]: 
         """
-        if self.request.method == 'POST':
-            return FileCreateSerializer  # Используем сериализатор для создания
-        return FileSerializer  # Используем сериализатор для других операций
+        method = self.request.method
+        if method == 'POST':
+            return FileCreateSerializer
+        else:
+            return FileSerializer
