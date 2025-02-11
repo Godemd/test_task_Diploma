@@ -1,11 +1,11 @@
 from functools import singledispatch
 from typing import Callable
 
-from app_lib.notifications.enums import NotificationType
-from app_lib.messages.message import RenameFileRequest
-from app_lib.log import get_logger
-from app_lib.services.main import Service
-from app_lib.services.notification_service import NotificationService
+from lib.app_lib.enums import NotificationType
+from lib.app_lib.messages.message import RenameFileRequest
+from lib.app_lib.log import get_logger
+from lib.app_lib.services.main import Service
+from lib.app_lib.services.notification_service import NotificationService
 
 from app.tools import send_to_all
 from tasks.models import File
@@ -20,6 +20,15 @@ def handler(
         notifications: 'NotificationService',
         message_ack: Callable
 ):
+    """
+    Generic handler
+
+    Args:
+        request (Request): _request_
+        service (Service): _service_
+        notifications (NotificationService): _notification_service_
+        message_ack (Callable): _message_ack_
+    """
     logger.warning('Unregister type[%s]', type(request))
     message_ack()
 
@@ -31,7 +40,14 @@ def _(
         notifications: 'NotificationService',
         message_ack: Callable
 ):
+    """
 
+    Args:
+        request (RenameFileRequest): _description_
+        service (Service): _description_
+        notifications (NotificationService): _description_
+        message_ack (Callable): _description_
+    """
     instance = File.objects.get(pk=request.id)
     _name = ""
     _extension = ""

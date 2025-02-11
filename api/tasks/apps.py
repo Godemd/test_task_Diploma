@@ -1,3 +1,4 @@
+
 from django.apps import AppConfig
 from django.conf import settings
 
@@ -10,43 +11,46 @@ from lib.app_lib.services.notification_service import NotificationService
 
 class TasksConfig(AppConfig):
     name = 'tasks'
-    _service_instance: Service = None
-    _notification_instance: NotificationService = None
-    _connection_instance: SyncConnection = None
+    _service: 'Service' = None
+    _notifications: 'NotificationService' = None
+    _connection: 'SyncConnection' = None
 
     @property
-    def connection(self) -> SyncConnection:
-        """ Инициализация и возврат экземпляра соединения.
+    def connection(self) -> 'SyncConnection':
+        """ Creates connection if not exists
 
-        Возвращает:
-            SyncConnection: Активное соединение.
+        Returns:
+            SyncConnection: connection
         """
-        if self._connection_instance is None:
+        if not self._connection:
             connection_class = getattr(app_lib, settings.APP_SERVICE_CONNECTION)
-            self._connection_instance = connection_class(settings.APP_SERVICE_URL)
-            self._connection_instance.connect()
-        return self._connection_instance
+            connection = connection_class(settings.APP_SERVICE_URL)
+            connection.connect()
+            self._connection = connection
+        return self._connection
 
     @property
-    def service(self) -> Service:
-        """ Инициализация и возврат экземпляра сервиса.
+    def service(self) -> 'Service':
+        """ Creates service if not exists
 
-        Возвращает:
-            Service: Настроенный экземпляр сервиса.
+        Returns:
+            Service: service
         """
-        if self._service_instance is None:
-            self._service_instance = Service(**controller_config)
-            self._service_instance.setup(self.connection)
-        return self._service_instance
+        if not self._service:
+            service = Service(**controller_config)
+            service.setup(self.connection)
+            self._service = service
+        return self._service
 
     @property
-    def notifications(self) -> NotificationService:
-        """ Инициализация и возврат экземпляра сервиса уведомлений.
+    def notifications(self) -> 'NotificationService':
+        """ Creates notification service if not exists
 
-        Возвращает:
-            NotificationService: Настроенный экземпляр сервиса уведомлений.
+        Returns:
+            NotificationService: notification service
         """
-        if self._notification_instance is None:
-            self._notification_instance = NotificationService()
-            self._notification_instance.setup(self.connection, create_queue=False)
-        return self._notification_instance
+        if not self._notifications:
+            notifications = NotificationService()
+            notifications.setup(self.connection, create_queue=False)
+            self._notifications = notifications
+        return self._notifications
