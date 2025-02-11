@@ -64,7 +64,7 @@ def test_files_service(
 
     file_instance = File.objects.get(pk=file_pk)
 
-    assert file_instance.name == '.'.join(tested_file_split_name)
+    assert file_instance.name == tested_file_split_name[0]
     # Если расширение не предполагается отдельно, можно проверить,
     # что file_instance.extension пустой:
-    assert not file_instance.extension
+    assert file_instance.extension == tested_file_split_name[1]
