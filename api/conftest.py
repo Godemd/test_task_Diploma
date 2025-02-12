@@ -2,12 +2,11 @@ from queue import Empty
 from typing import TYPE_CHECKING
 
 import pytest
+from app_lib.services.notification_service import NotificationService
 from django.apps import apps
 from django.contrib.auth.models import User
 from django.core.files.uploadedfile import SimpleUploadedFile
-from app_lib.services.notification_service import NotificationService
 from rest_framework.test import APIClient
-
 from tasks.handlers import handler
 from tasks.models import File
 

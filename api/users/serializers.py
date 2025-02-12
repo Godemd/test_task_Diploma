@@ -1,6 +1,5 @@
 from django.contrib.auth.models import User
 from rest_framework.serializers import CharField, ModelSerializer, Serializer
-
 from users.permissions import IsOwnerOrReadOnly
 
 

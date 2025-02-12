@@ -1,13 +1,13 @@
-import pytest
-from typing import TYPE_CHECKING, Callable, NoReturn, Tuple, Any
+from typing import TYPE_CHECKING, Any, Callable, NoReturn, Tuple
 
+import pytest
 from app_lib.messages.message import RenameFileRequest
 from tasks.models import File
 
 if TYPE_CHECKING:
-    from rest_framework.test import APIClient
-    from django.core.files.uploadedfile import SimpleUploadedFile
     from django.contrib.auth.models import User
+    from django.core.files.uploadedfile import SimpleUploadedFile
+    from rest_framework.test import APIClient
 
 
 Service = Tuple[Callable[[Any], NoReturn], Callable[[], dict], Callable[[], dict]]
@@ -15,9 +15,7 @@ Service = Tuple[Callable[[Any], NoReturn], Callable[[], dict], Callable[[], dict
 
 @pytest.mark.django_db
 def test_files_normal_flow(
-        client: 'APIClient',
-        user: 'User',
-        tested_file: 'SimpleUploadedFile'
+    client: 'APIClient', user: 'User', tested_file: 'SimpleUploadedFile'
 ):
     response = client.post(
         '/api/v1/files/', data={'file': tested_file}, format='multipart'
@@ -36,10 +34,10 @@ def test_files_normal_flow(
 
 @pytest.mark.django_db
 def test_files_service(
-        client: 'APIClient',
-        file_data: dict,
-        service: Service,
-        tested_file_split_name: 'Tuple'
+    client: 'APIClient',
+    file_data: dict,
+    service: Service,
+    tested_file_split_name: 'Tuple',
 ):
 
     file_pk = file_data.get("id")

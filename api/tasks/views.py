@@ -1,16 +1,16 @@
 from typing import Type
+
+from app_lib.messages.message import RenameFileRequest
+from django.apps import apps
 from django.db.models import QuerySet
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.serializers import BaseSerializer
 from rest_framework.viewsets import ModelViewSet
-
-from app_lib.messages.message import RenameFileRequest
 from tasks.apps import TasksConfig
 from tasks.models import File
 from tasks.serializers import FileCreateSerializer, FileSerializer
-from django.apps import apps
 
 app_config: 'TasksConfig' = apps.get_app_config('tasks')
 
@@ -23,7 +23,7 @@ class FileModelViewSet(ModelViewSet):
         """
 
         Returns:
-            QuerySet: 
+            QuerySet:
         """
         return self.queryset.all()
 
@@ -68,7 +68,7 @@ class FileModelViewSet(ModelViewSet):
         """get serializer class
 
         Returns:
-            Type[BaseSerializer]: 
+            Type[BaseSerializer]:
         """
         method = self.request.method
         if method == 'POST':

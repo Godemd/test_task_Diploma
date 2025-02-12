@@ -1,13 +1,12 @@
 from functools import singledispatch
 from typing import Callable
 
+from app.tools import send_to_all
 from app_lib.enums import NotificationType
-from app_lib.messages.message import RenameFileRequest
 from app_lib.log import get_logger
+from app_lib.messages.message import RenameFileRequest
 from app_lib.services.main import Service
 from app_lib.services.notification_service import NotificationService
-
-from app.tools import send_to_all
 from tasks.models import File
 
 logger = get_logger('tasks.handlers')
@@ -15,10 +14,10 @@ logger = get_logger('tasks.handlers')
 
 @singledispatch
 def handler(
-        request,
-        service: Service,
-        notifications: 'NotificationService',
-        message_ack: Callable
+    request,
+    service: Service,
+    notifications: 'NotificationService',
+    message_ack: Callable,
 ):
     """
     Generic handler
@@ -35,10 +34,10 @@ def handler(
 
 @handler.register
 def _(
-        request: 'RenameFileRequest',
-        service: Service,
-        notifications: 'NotificationService',
-        message_ack: Callable
+    request: 'RenameFileRequest',
+    service: Service,
+    notifications: 'NotificationService',
+    message_ack: Callable,
 ):
     """
 
@@ -66,6 +65,6 @@ def _(
     send_to_all(
         data={"action": "update_files"},
         notifications=notifications,
-        notification_type=NotificationType.UPDATE_FILES
+        notification_type=NotificationType.UPDATE_FILES,
     )
     message_ack()

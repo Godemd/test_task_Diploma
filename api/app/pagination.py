@@ -1,4 +1,3 @@
-from django.conf import settings
 from rest_framework.exceptions import ValidationError
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.request import Request

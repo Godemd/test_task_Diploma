@@ -8,7 +8,6 @@ from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
-
 from users.pagination import UsersPagination
 from users.serializers import (
     LoginSerializer,

@@ -2,7 +2,6 @@ from typing import Any
 
 from rest_framework.fields import CharField
 from rest_framework.serializers import ModelSerializer
-
 from tasks.models import File
 
 
