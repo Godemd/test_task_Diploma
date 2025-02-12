@@ -12,12 +12,32 @@ TEST_PASSWORD = 'test_pass'
 
 @pytest.fixture
 def user_with_password(user: 'User'):
+    """
+    Устанавливает тестовый пароль для пользователя и сохраняет изменения.
+
+    Аргументы:
+        user (User): Объект пользователя.
+
+    Возвращает:
+        User: Пользователь с установленным тестовым паролем.
+    """
     user.set_password(TEST_PASSWORD)
     user.save()
     return user
 
 
 def login_user(client: 'APIClient', username: str, password: str) -> dict:
+    """
+    Выполняет попытку входа пользователя с заданными учетными данными.
+
+    Аргументы:
+        client (APIClient): Клиент для выполнения HTTP-запросов.
+        username (str): Имя пользователя.
+        password (str): Пароль пользователя.
+
+    Возвращает:
+        dict: Словарь, содержащий статус запроса и объект ответа.
+    """
     response = client.post(
         '/api/auth/login/',
         data={'username': username, 'password': password},
@@ -31,7 +51,7 @@ def login_user(client: 'APIClient', username: str, password: str) -> dict:
 
 @pytest.mark.django_db
 def test_auth_using_login_pass(anon_client: 'APIClient', user_with_password: 'User'):
-    """Тестирование аутентификации с помощью логина и пароля"""
+    """Тестирование аутентификации с помощью логина и пароля."""
     username = user_with_password.username
 
     # Проверка с неправильным паролем
@@ -48,7 +68,7 @@ def test_auth_using_login_pass(anon_client: 'APIClient', user_with_password: 'Us
 
 @pytest.mark.django_db
 def test_user_flow(admin_client: 'APIClient', anon_client: 'APIClient'):
-    """Тестирование полного цикла работы с пользователями"""
+    """Тестирование полного цикла работы с пользователями."""
     users_count = 20
     users_data = [
         {

@@ -21,20 +21,29 @@ class FileModelViewSet(ModelViewSet):
 
     def get_queryset(self) -> 'QuerySet':
         """
+        Возвращает QuerySet, содержащий все объекты модели File.
 
-        Returns:
-            QuerySet:
+        Возвращает:
+            QuerySet: Набор объектов File.
         """
         return self.queryset.all()
 
     def create(self, request, *args, **kwargs):
-        """creating file
+        """
+        Создает новый объект File.
 
-        Args:
-            request (Request): _request_
+        Этапы:
+            - Валидирует и сохраняет данные запроса для создания файла.
+            - Отправляет запрос на переименование файла через контроллер сервиса.
+            - Возвращает ответ с данными созданного объекта File.
 
-        Returns:
-            Response: _description_
+        Аргументы:
+            request (Request): Объект запроса.
+            *args: Дополнительные позиционные аргументы.
+            **kwargs: Дополнительные именованные аргументы.
+
+        Возвращает:
+            Response: Ответ с данными созданного файла, HTTP-статусом 201 и заголовками.
         """
         serializer = self.get_serializer(data=request.data)
 
@@ -51,13 +60,20 @@ class FileModelViewSet(ModelViewSet):
         )
 
     def destroy(self, request, *args, **kwargs):
-        """destroy files
+        """
+        Удаляет объект File.
 
-        Args:
-            request (Request): _request_
+        Этапы:
+            - Получает объект File для удаления.
+            - Удаляет объект и возвращает его идентификатор.
 
-        Returns:
-            Response: _description_
+        Аргументы:
+            request (Request): Объект запроса.
+            *args: Дополнительные позиционные аргументы.
+            **kwargs: Дополнительные именованные аргументы.
+
+        Возвращает:
+            Response: Ответ с идентификатором удаленного файла и HTTP-статусом 202.
         """
         instance = self.get_object()
         pk = instance.pk
@@ -65,10 +81,14 @@ class FileModelViewSet(ModelViewSet):
         return Response(data=pk, status=status.HTTP_202_ACCEPTED)
 
     def get_serializer_class(self) -> Type['BaseSerializer']:
-        """get serializer class
+        """
+        Определяет и возвращает класс сериализатора в зависимости от метода запроса.
 
-        Returns:
-            Type[BaseSerializer]:
+        Если метод запроса POST, используется сериализатор для создания файла,
+        в противном случае – стандартный сериализатор для модели File.
+
+        Возвращает:
+            Type[BaseSerializer]: Класс сериализатора.
         """
         method = self.request.method
         if method == 'POST':

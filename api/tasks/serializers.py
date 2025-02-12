@@ -1,3 +1,12 @@
+"""
+Модуль сериализаторов для работы с моделью File.
+
+Содержит два сериализатора:
+    - FileCreateSerializer: используется для создания объекта File с возможностью указания имени файла.
+      Если имя не задано, оно будет определено из имени загруженного файла.
+    - FileSerializer: сериализатор, возвращающий все поля модели File.
+"""
+
 from typing import Any
 
 from rest_framework.fields import CharField
@@ -6,6 +15,11 @@ from tasks.models import File
 
 
 class FileCreateSerializer(ModelSerializer):
+    """
+    Сериализатор для создания объекта File.
+
+    Позволяет указать имя файла. Если имя не задано, оно будет установлено равным имени загруженного файла.
+    """
     name = CharField(max_length=2048, required=False)
 
     class Meta:
@@ -21,6 +35,9 @@ class FileCreateSerializer(ModelSerializer):
 
 
 class FileSerializer(ModelSerializer):
+    """
+    Сериализатор для модели File, возвращающий все поля модели.
+    """
 
     class Meta:
         model = File
