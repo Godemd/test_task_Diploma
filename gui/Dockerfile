@@ -11,7 +11,7 @@ RUN yarn
 COPY ./ /temp/
 RUN yarn build
 
-FROM nginx:1.17.9-alpine
+FROM nginx:alpine
 RUN mkdir /var/www /var/www/frontend /var/www/backend
 COPY --from=api /app/api/files/static/ /var/www/backend/
 COPY --from=gui /temp/build/ /var/www/frontend/
