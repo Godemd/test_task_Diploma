@@ -50,8 +50,7 @@ class ConnectionRegister:
                 conn.write_message(data)
             except WebSocketError:
                 logger.exception(
-                    'Send error for task[%s] and user[%s]',
-                    notification.user_id
+                    'Send error for task[%s] and user[%s]', notification.user_id
                 )
 
 

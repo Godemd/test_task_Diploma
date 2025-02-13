@@ -16,6 +16,7 @@ class BasePagination(PageNumberPagination):
 
     Позволяет задавать набор допустимых размеров страницы и проверять входные параметры.
     """
+
     page_size: int
     page_sizes = [10, 20, 50]
 

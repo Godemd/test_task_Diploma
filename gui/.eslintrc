@@ -9,7 +9,7 @@
     "jsx-quotes": 1,
     "linebreak-style": [
       2,
-      "windows"
+      "unix"
     ],
     "quotes": [
       2,

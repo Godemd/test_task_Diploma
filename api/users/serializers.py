@@ -9,6 +9,7 @@ class LoginSerializer(Serializer):
 
     Позволяет принимать имя пользователя и пароль для аутентификации.
     """
+
     username = CharField(write_only=True)
     password = CharField(write_only=True)
 
@@ -19,6 +20,7 @@ class MeSerializer(ModelSerializer):
 
     Возвращает основные поля пользователя.
     """
+
     class Meta:
         model = User
         fields = ('id', 'username', 'first_name', 'last_name', 'email', 'is_staff')
@@ -30,6 +32,7 @@ class UserSerializer(ModelSerializer):
 
     Позволяет создавать нового пользователя, учитывая права доступа.
     """
+
     permission_classes = (IsOwnerOrReadOnly,)
 
     class Meta:
@@ -41,10 +44,10 @@ class UserSerializer(ModelSerializer):
     def create(self, validated_data: dict) -> 'User':
         """
         Создает нового пользователя с использованием валидированных данных.
-        
+
         Аргументы:
             validated_data (dict): Валидированные данные для создания пользователя.
-        
+
         Возвращает:
             User: Созданный объект пользователя.
         """
@@ -58,6 +61,7 @@ class UserListSerializer(ModelSerializer):
 
     Возвращает основные поля пользователя для списка.
     """
+
     class Meta:
         model = User
         fields = (

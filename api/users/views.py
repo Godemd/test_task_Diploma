@@ -23,6 +23,7 @@ class LoginView(APIView):
 
     Обрабатывает POST-запросы для аутентификации пользователя.
     """
+
     @method_decorator(csrf_protect)
     @method_decorator(never_cache)
     def post(self, request, *args, **kwargs):
@@ -64,6 +65,7 @@ class LogoutView(APIView):
     """
     Представление для выхода пользователя.
     """
+
     @method_decorator(never_cache)
     def post(self, request, *args, **kwargs):
         """
@@ -73,7 +75,7 @@ class LogoutView(APIView):
             request (Request): Объект запроса.
             *args: Дополнительные позиционные аргументы.
             **kwargs: Дополнительные именованные аргументы.
-        
+
         Возвращает:
             Response: Пустой ответ с HTTP-статусом 200.
         """
@@ -88,6 +90,7 @@ class MeViewSet(ReadOnlyModelViewSet):
 
     Обрабатывает запросы на получение данных пользователя (только для чтения).
     """
+
     permission_classes = (IsAuthenticated,)
     serializer_class = MeSerializer
 
@@ -107,6 +110,7 @@ class NotificationView(APIView):
 
     Обрабатывает GET-запросы для получения уведомлений через механизм ускоренной обработки.
     """
+
     permission_classes = (IsAuthenticated,)
 
     def get(self, request, *args, **kwargs):
@@ -138,6 +142,7 @@ class UserViewSet(ModelViewSet):
     Обрабатывает CRUD-операции для пользователей (не администраторов).
     Использует пагинацию и различные сериализаторы в зависимости от типа запроса.
     """
+
     queryset = User.objects.filter(is_staff=False).order_by('-id')
     permission_classes = (IsAdminUser,)
     serializer_class = UserSerializer

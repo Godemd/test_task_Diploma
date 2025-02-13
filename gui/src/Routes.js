@@ -15,7 +15,6 @@ const ROUTES = {
   SIGN_UP: '/sign-up',
   DASHBOARD: '/dashboard',
   NOT_FOUND: '/not-found',
-
   MAIN: '/'
 };
 
@@ -28,9 +27,7 @@ const getLocation = () => {
     SignUp: () => ROUTES.SIGN_UP,
     Dashboard: () => ROUTES.DASHBOARD,
     isDashboard: () => ROUTES.DASHBOARD === loc,
-
     NotFound: () => ROUTES.NOT_FOUND
-
   };
 };
 

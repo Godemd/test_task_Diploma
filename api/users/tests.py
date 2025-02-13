@@ -41,12 +41,9 @@ def login_user(client: 'APIClient', username: str, password: str) -> dict:
     response = client.post(
         '/api/auth/login/',
         data={'username': username, 'password': password},
-        format='json'
+        format='json',
     )
-    return {
-        'status': response.status_code,
-        'response': response
-    }
+    return {'status': response.status_code, 'response': response}
 
 
 @pytest.mark.django_db
@@ -83,7 +80,9 @@ def test_user_flow(admin_client: 'APIClient', anon_client: 'APIClient'):
     # 1. Создание пользователей
     for user_data in users_data:
         response = admin_client.post('/api/v1/users/', data=user_data, format='json')
-        assert response.status_code == 201, f"Ошибка создания пользователя: {response.content}"
+        assert (
+            response.status_code == 201
+        ), f"Ошибка создания пользователя: {response.content}"
         created_users_ids.append(response.json()['id'])
 
     # 2. Проверка количества созданных пользователей
@@ -98,14 +97,16 @@ def test_user_flow(admin_client: 'APIClient', anon_client: 'APIClient'):
             users_list = json.loads(users_list)
         users_list = [json.loads(u) if isinstance(u, str) else u for u in users_list]
         total_count = len([u for u in users_list if u.get('id') in created_users_ids])
-    assert total_count == users_count, (
-        f"Количество созданных пользователей не совпадает: ожидалось {users_count}"
-    )
+    assert (
+        total_count == users_count
+    ), f"Количество созданных пользователей не совпадает: ожидалось {users_count}"
 
     # 3. Проверка авторизации для каждого пользователя
     for i in range(users_count):
         auth_data = {'username': f'user_{i}', 'password': f'password_{i}'}
-        login_attempt = login_user(anon_client, auth_data['username'], auth_data['password'])
+        login_attempt = login_user(
+            anon_client, auth_data['username'], auth_data['password']
+        )
         assert login_attempt['status'] == 200, (
             f"Ошибка авторизации пользователя {auth_data['username']}: "
             f"{login_attempt['response'].content}"
@@ -114,7 +115,9 @@ def test_user_flow(admin_client: 'APIClient', anon_client: 'APIClient'):
     # 4. Удаление созданных пользователей
     for user_id in created_users_ids:
         response = admin_client.delete(f'/api/v1/users/{user_id}/')
-        assert response.status_code == 204, f"Ошибка удаления пользователя {user_id}: {response.content}"
+        assert (
+            response.status_code == 204
+        ), f"Ошибка удаления пользователя {user_id}: {response.content}"
 
     # Проверка удаления
     response = admin_client.get('/api/v1/users/')

@@ -20,6 +20,7 @@ class FileCreateSerializer(ModelSerializer):
 
     Позволяет указать имя файла. Если имя не задано, оно будет установлено равным имени загруженного файла.
     """
+
     name = CharField(max_length=2048, required=False)
 
     class Meta:
